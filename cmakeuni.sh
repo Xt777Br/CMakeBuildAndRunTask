@@ -16,16 +16,11 @@ for arg in "$@"; do
     esac
 done
 
-# Print the current working directory and path to CMakeLists.txt
-echo "$(pwd)/CMakeLists.txt"
 dir=$(pwd)
 
 # Extract the target name from CMakeLists.txt
 project_name=$(grep -E 'project([^()]*)' "$dir/CMakeLists.txt")
-
 target_name=$(echo "$project_name" | sed -e 's/.*(\(.*\)).*/\1/' -e 's/"//g')
-# Print the extracted target name
-echo "$target_name"
 
 # Check if a target name was found
 if [ -z "$target_name" ]; then
@@ -33,13 +28,13 @@ if [ -z "$target_name" ]; then
   exit 1
 fi
 
+# Oneline build
 if $has_build; then
-rm -rf $dir/build && mkdir $dir/build && cd $dir/build && cmake $dir && cmake --build $dir/build
+  rm -rf $dir/build && mkdir $dir/build && cd $dir/build && cmake $dir && cmake --build $dir/build
 fi
 
-
 # Check if the target executable exists and is runnable
-if [ -x "./$target_name" ]; then
+if [ -x "$dir/build/$target_name" ]; then
   # Run the target executable
   if $has_run; then
     $dir/build/"$target_name"
